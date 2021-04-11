@@ -1,12 +1,34 @@
 const express=require('express');
-var randomstring = require("randomstring");
+let randomstring = require("randomstring");
+const rateLimit = require("express-rate-limit");
 const app=express()
 const router=express.Router();
 let tempDb=[];
+ipdb=[]
 let newvalue="voute"
 app.use(express.json())
 
-router.post("/create",(req,res) => {
+const apiLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    max: 3,
+    message:{
+        status:429,
+        type:'error',
+        message:"Too Many request. Try again after 5 Minutes"
+    }
+  }
+  );
+  const userLimiter = rateLimit({
+    max: 1,
+    message:{
+        status:403,
+        type:'error',
+        message:"User/Someone in your network has already voted"
+    }
+  }
+  );
+
+router.post("/create" ,apiLimiter,(req,res) => {
     let selectionStore=[];
     let question;
     const slug=randomstring.generate({
@@ -58,7 +80,7 @@ router.get("/result/:slugInput",(req,res) => {
 
 //Update Queries Goes Here
 
-router.post("/vote/:slugInput/:id",(req,res) => {
+router.get("/vote/:slugInput/:id",(req,res) => {
    const slugInput=req.params.slugInput
    const id=req.params.id
    let voteData=tempDb.find(voteEl => voteEl.slug === slugInput);
