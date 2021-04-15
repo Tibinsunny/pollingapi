@@ -63,7 +63,7 @@ router.post("/create" ,apiLimiter,(req,res) => {
     }
 
     tempDb.push(data)
-    res.json(tempDb)
+    res.json(data)
 })
 //Result API
 router.get("/result/:slugInput",(req,res) => {
@@ -92,8 +92,13 @@ router.post("/vote/:slugInput/:id",(req,res) => {
    else
    {
     voteData.selection[id].key.vote++
-    voteData.ipCollection.push(req.ip)
-    res.send(voteData)
+    (voteData.ipCollection).push(req.ip)
+    res.json({
+        slug:voteData.slug,
+        question:voteData.question,
+        selection:voteData.selection
+
+    })
    }
  
 
