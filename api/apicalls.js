@@ -4,10 +4,10 @@ const rateLimit = require("express-rate-limit");
 const app=express()
 const router=express.Router();
 let tempDb=[];
-ipdb=[]
-let newvalue="voute"
+let ipdb=[]
 app.use(express.json())
 
+//Rate Limiter
 const apiLimiter = rateLimit({
     windowMs: 5 * 60 * 1000, // 5 minutes
     max: 3,
@@ -23,11 +23,12 @@ const apiLimiter = rateLimit({
     message:{
         status:403,
         type:'error',
-        message:"User/Someone in your network has already voted"
+        message:"Too Many Requests"
     }
   }
   );
 
+  //Creates a New Poll :Syntax url site.com/api/v1/create?asdasd=answer1&option2=answer2&question=question
 router.post("/create" ,apiLimiter,(req,res) => {
     let selectionStore=[];
     let question;
@@ -56,42 +57,49 @@ router.post("/create" ,apiLimiter,(req,res) => {
     let data={
         slug:slug,
         question:question,
-        selection:selectionStore
+        selection:selectionStore,
+        ipCollection:[]
 
     }
 
     tempDb.push(data)
     res.json(tempDb)
 })
-//This should be removed 
-
-router.get("/",(req,res) => {
-    res.json(tempDb)
-  
-})
-
-
+//Result API
 router.get("/result/:slugInput",(req,res) => {
     const { slugInput }=req.params
     let data=tempDb.find(el => el.slug === slugInput);
-    res.json(data)
+    res.json({
+        slug:data.slug,
+        question:data.question,
+        selection:data.selection
+
+    })
 })
 
 
-//Update Queries Goes Here
-
-router.get("/vote/:slugInput/:id",(req,res) => {
+//Update Queries Goes Here: Voting API
+router.post("/vote/:slugInput/:id",(req,res) => {
    const slugInput=req.params.slugInput
    const id=req.params.id
-   let voteData=tempDb.find(voteEl => voteEl.slug === slugInput);
-  voteData.selection[id].key.vote++
-res.send(voteData)
+   let voteData=tempDb.find(voteEl => voteEl.slug === slugInput); 
+   if((voteData.ipCollection).includes(req.ip))
+   {
+       res.status(409).json({
+           error:'User/Someone in Network has already voted'
+       })
+   }
+   else
+   {
+    voteData.selection[id].key.vote++
+    ipdb.push(req.ip)
+    voteData.ipCollection=ipdb;
+    res.send(voteData)
+   }
+ 
+
+
+   
 
 })
-
-
-
-
 module.exports = router;
-
-//http://127.0.0.1:4455/api/v1/slug/question1
