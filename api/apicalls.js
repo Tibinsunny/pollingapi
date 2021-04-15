@@ -92,8 +92,7 @@ router.post("/vote/:slugInput/:id",(req,res) => {
    else
    {
     voteData.selection[id].key.vote++
-    ipdb.push(req.ip)
-    voteData.ipCollection=ipdb;
+    voteData.ipCollection.push(req.ip)
     res.send(voteData)
    }
  
