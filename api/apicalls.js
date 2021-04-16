@@ -63,9 +63,10 @@ router.post("/create" ,apiLimiter,(req,res) => {
     }
 
     tempDb.push(data)
+    // res.json(tempDb) uncomment this For development
     res.json(data)
 })
-//Result API
+//Result API also returns current Slug and Question
 router.get("/result/:slugInput",(req,res) => {
     const { slugInput }=req.params
     let data=tempDb.find(el => el.slug === slugInput);
