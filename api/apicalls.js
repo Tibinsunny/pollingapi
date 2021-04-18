@@ -97,19 +97,15 @@ router.post("/vote/:slugInput/:id",(req,res) => {
     {
         const filter = { slug: doc.slug };
         const update = { $set: {} };
+       let ipArray=[...doc.ipCollection]
+       ipArray.push(req.ip)
         let voteValue=Number(doc.selection[id].key.vote)+1
         update.$set[`selection.${id}.key.vote`] = voteValue;
+        polling.findOneAndUpdate(filter,{$set:{ipCollection:ipArray }})
      polling.findOneAndUpdate(filter, update).then((updatedDoc) => { res.send(updatedDoc)})
-
+   
 
     }
 });
-
-
- 
-
-
-   
-
 })
 module.exports = router;
