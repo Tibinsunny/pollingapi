@@ -1,12 +1,15 @@
 const express=require('express');
 let randomstring = require("randomstring");
 const rateLimit = require("express-rate-limit");
+const monk=require("monk")
 const app=express()
 const router=express.Router();
-let tempDb=[];
-let ipdb=[]
 app.use(express.json())
-
+//Use below statement you are running on a VPS or your on server
+const db = require('monk')('localhost/mydb')
+//Or use 
+// const db = require('monk')('user:pass@localhost:port/mydb')
+const polling = db.get('polling')
 //Rate Limiter
 const apiLimiter = rateLimit({
     windowMs: 5 * 60 * 1000, // 5 minutes
@@ -62,45 +65,47 @@ router.post("/create" ,apiLimiter,(req,res) => {
 
     }
 
-    tempDb.push(data)
-    // res.json(tempDb) uncomment this For development
+    polling.insert(data)
     res.json(data)
 })
 //Result API also returns current Slug and Question
 router.get("/result/:slugInput",(req,res) => {
     const { slugInput }=req.params
-    let data=tempDb.find(el => el.slug === slugInput);
-    res.json({
-        slug:data.slug,
-        question:data.question,
-        selection:data.selection
+    polling.findOne({slug: slugInput}).then((doc) => {
+        // console.log(doc.selection[0].key.vote)
+            res.json({
+        slug:doc.slug,
+        question:doc.question,
+        selection:doc.selection
 
     })
+    });
 })
-
-
 //Update Queries Goes Here: Voting API
 router.post("/vote/:slugInput/:id",(req,res) => {
    const slugInput=req.params.slugInput
    const id=req.params.id
-   let voteData=tempDb.find(voteEl => voteEl.slug === slugInput); 
-   if((voteData.ipCollection).includes(req.ip))
-   {
-       res.status(409).json({
-           error:'User/Someone in Network has already voted'
-       })
-   }
-   else
-   {
-    voteData.selection[id].key.vote++
-    (voteData.ipCollection).push(req.ip)
-    res.json({
-        slug:voteData.slug,
-        question:voteData.question,
-        selection:voteData.selection
+   polling.findOne({slug: slugInput}).then((doc) => {
 
-    })
-   }
+    if((doc.ipCollection).includes(req.ip))
+    {
+        res.status(409).json({
+            error:'User/Someone in Network has already voted'
+        })
+    }
+    else
+    {
+        const filter = { slug: doc.slug };
+        const update = { $set: {} };
+        let voteValue=Number(doc.selection[id].key.vote)+1
+        update.$set[`selection.${id}.key.vote`] = voteValue;
+     polling.findOneAndUpdate(filter, update).then((updatedDoc) => { res.send(updatedDoc)})
+
+
+    }
+});
+
+
  
 
 

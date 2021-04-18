@@ -20,7 +20,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "express-rate-limit": "^5.2.6",
-    "monk": "^7.3.3",
+    "monk": "^7.3.4",
     "randomstring": "^1.1.5"
   }
 }
