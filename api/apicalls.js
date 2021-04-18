@@ -65,8 +65,14 @@ router.post("/create" ,apiLimiter,(req,res) => {
 
     }
 
-    polling.insert(data)
-    res.json(data)
+    polling.insert(data).then((doc) => {
+        res.json({
+            slug:doc.slug,
+            question:doc.question,
+            selection:selectionStore,
+        })
+    })
+    
 })
 //Result API also returns current Slug and Question
 router.get("/result/:slugInput",(req,res) => {
@@ -102,7 +108,12 @@ router.post("/vote/:slugInput/:id",(req,res) => {
         let voteValue=Number(doc.selection[id].key.vote)+1
         update.$set[`selection.${id}.key.vote`] = voteValue;
         polling.findOneAndUpdate(filter,{$set:{ipCollection:ipArray }})
-     polling.findOneAndUpdate(filter, update).then((updatedDoc) => { res.send(updatedDoc)})
+     polling.findOneAndUpdate(filter, update).then((updatedDoc) => {res.json({
+        slug:updatedDoc.slug,
+        question:updatedDoc.question,
+        selection:updatedDoc.selection
+
+    })})
    
 
     }
