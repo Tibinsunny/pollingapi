@@ -12,7 +12,7 @@ const db = require('monk')('localhost/mydb')
 const polling = db.get('polling')
 //Rate Limiter
 const apiLimiter = rateLimit({
-    windowMs: 5 * 60 * 1000, // 5 minutes
+    windowMs: 2 * 60 * 1000, // 5 minutes
     max: 3,
     message:{
         status:429,
@@ -33,6 +33,7 @@ const apiLimiter = rateLimit({
 
   //Creates a New Poll :Syntax url site.com/api/v1/create?asdasd=answer1&option2=answer2&question=question
 router.post("/create" ,apiLimiter,(req,res) => {
+    let flag=0;
     let selectionStore=[];
     let question;
     const slug=randomstring.generate({
@@ -41,7 +42,7 @@ router.post("/create" ,apiLimiter,(req,res) => {
       });
       for (var key in req.query) {
             if(key==="question"){
-              
+                flag=1;
                 question=req.query[key];
                 
                 continue;
@@ -64,7 +65,14 @@ router.post("/create" ,apiLimiter,(req,res) => {
         ipCollection:[]
 
     }
-
+if(flag==0)
+{
+    res.status(400).json({
+        'error':'Question is required'
+    })
+}
+else
+{
     polling.insert(data).then((doc) => {
         res.json({
             slug:doc.slug,
@@ -72,7 +80,9 @@ router.post("/create" ,apiLimiter,(req,res) => {
             selection:selectionStore,
         })
     })
-    
+}
+
+
 })
 //Result API also returns current Slug and Question
 router.get("/result/:slugInput",(req,res) => {
