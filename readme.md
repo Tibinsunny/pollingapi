@@ -1,10 +1,10 @@
 
 <p style="text-align:center">A PollingApi is a voting system that can be used to generate <b>quick</b> polling links that can be used in your project. It is completely free and easy to use</p>
-<div style="text-align:center"><p>
+<p style="text-align:center">
     <img src="https://img.shields.io/badge/version-0.1.0-blue.svg" title="version" alt="version">
     <a href="https://github.com/mufeedvh/binserve/blob/master/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/mufeedvh/binserve.svg"></a>
   
-</p></div>
+</p>
 
 ## API 
 
