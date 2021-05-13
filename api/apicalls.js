@@ -88,6 +88,7 @@ else
 router.get("/result/:slugInput",(req,res) => {
     const { slugInput }=req.params
     polling.findOne({slug: slugInput}).then((doc) => {
+      
         // console.log(doc.selection[0].key.vote)
             res.json({
         slug:doc.slug,

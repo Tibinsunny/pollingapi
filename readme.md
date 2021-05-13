@@ -2,8 +2,7 @@
 <div style="align:center"><p style="align:center">A PollingApi is a voting system that can be used to generate <b>quick</b> polling links that can be used in your project. It is completely free and easy to use</p>
 <p style="align:center">
     <img src="https://img.shields.io/badge/version-0.1.0-blue.svg" title="version" alt="version">
-    <a href="https://github.com/mufeedvh/binserve/blob/master/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/mufeedvh/binserve.svg"></a>
-  
+
 </p></div>
 
 ## API 
@@ -82,3 +81,34 @@ Now the following JSON response is obtained
 }
 ```
 The `vote` value of `React` is increased.
+
+
+
+ ### /api/v1/result/poll_id/
+ * `GET` : This end point allows users to view the result of Poll.
+
+```
+GET: http://127.0.0.1:4455/api/v1/result/bDeVrbuIKtjC/
+
+```
+
+```json
+{
+    "slug": "bDeVrbuIKtjC",
+    "question": "Which language should i choose",
+    "selection": [
+        {
+            "key": {
+                "name": "test",
+                "vote": 1
+            }
+        },
+        {
+            "key": {
+                "name": "angular",
+                "vote": 0
+            }
+        }
+    ]
+}
+```
